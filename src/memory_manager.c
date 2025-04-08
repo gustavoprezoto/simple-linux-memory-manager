@@ -20,8 +20,7 @@
     {                                                                       \
         int __count = 0;                                                    \
         for (;                                                              \
-             __count < MM_MAX_FAMILIES_PER_VM_PAGE &&                       \
-             vm_page_for_families_ptr->vm_page_family[__count].struct_size; \
+             __count < MM_MAX_FAMILIES_PER_VM_PAGE;                       \
              __count++)                                                     \
         {                                                                   \
             curr = &vm_page_for_families_ptr->vm_page_family[__count];
@@ -35,7 +34,7 @@
  * @param vm_page_for_families_ptr Same pointer passed to the BEGIN macro.
  * @param curr The iterator variable used in the BEGIN macro.
  */
-#define ITERATE_PAGE_FAMILIES_END(vm_page_for_families_ptr, curr) \
+#define ITERATE_PAGE_FAMILIES_END() \
     }                                                             \
     }
 
@@ -126,25 +125,22 @@ static void __mm_release_vm_pages_to_kernel(void *page, int units) {
  * 
  * @return A pointer to a first initialized vm_page_for_families_t object.
  */
-static vm_page_for_families_t* __mm_create_new_page_for_families_struct(char *struct_name, __uint32_t struct_size) {
+static vm_page_for_families_t* __mm_create_new_metadata_page_for_struct_families(char *struct_name, __uint32_t struct_size) {
     vm_page_for_families_t *page = (vm_page_for_families_t*) __mm_get_new_vm_pages_from_kernel(1);
 
     // Creates the first page family entry
     strncpy(page->vm_page_family[0].struct_name, struct_name, sizeof(page->vm_page_family[0].struct_name));
     page->vm_page_family[0].struct_size = struct_size;
 
-    page->next = NULL;
-
     return page;
 }
 
-static size_t __is_vm_page_for_families_full(vm_page_for_families_t *page) {
-    printf("test");
+static __uint8_t __is_family_metadata_page_full(vm_page_for_families_t *page) {
     vm_page_family_t *family = NULL;
 
     // todo: This function can be improved using a flag in the struct
     for (size_t i; i < MM_MAX_FAMILIES_PER_VM_PAGE; i++) {
-        if (page->vm_page_family[i].struct_size) {
+        if (page->vm_page_family[i].struct_size == 0) {
             return FALSE;
         }
     }
@@ -157,34 +153,32 @@ static void __mm_add_new_family_group_page_to_global_group(vm_page_for_families_
     last_family_group_page = new_page;
 }
 
-static void __mm_add_struct_to_global_families(char *struct_name, __uint32_t struct_size) {
-    vm_page_for_families_t *iter = first_family_group_page;
-    
-    while(iter != NULL) {
-        for (__uint32_t i = 0; i < MM_MAX_FAMILIES_PER_VM_PAGE; i++) {
-            
+static void __mm_add_struct_to_global_families(char *struct_name, __uint32_t struct_size) {    
+    // Iterates to find the next available family metadata group to add the new struct.
+    vm_page_family_t *page_family_iter = NULL;
+    vm_page_for_families_t *metadata_page_iter = first_family_group_page;
+    while (TRUE) {
+        ITERATE_PAGE_FAMILIES_BEGIN(metadata_page_iter, page_family_iter) {
+            if (page_family_iter->struct_size == NULL || page_family_iter->struct_size == 0) {
+                strncpy(page_family_iter->struct_name, struct_name, sizeof(page_family_iter->struct_name));
+                page_family_iter->struct_size = struct_size;
+                printf("Struct: %s\n", page_family_iter->struct_name);
+                return;
+            }
+        } ITERATE_PAGE_FAMILIES_END()
+
+        if (first_family_group_page->next == NULL) {
+            vm_page_for_families_t *new_family_metadata_page = __mm_create_new_metadata_page_for_struct_families(struct_name, struct_size);
+            new_family_metadata_page->next = first_family_group_page;
+            first_family_group_page = new_family_metadata_page;
+            printf("Criou uma nova struct: %s\n", first_family_group_page->vm_page_family[0].struct_name);
+            return;
+        }
+        else {
+            printf("Procurando a proxima pagina\n");
+            metadata_page_iter = first_family_group_page->next;
         }
     }
-    // i need to iterate for each vm_page_for_families_t entry
-    // while (1) {
-    //     if (__is_vm_page_for_families_full(first_family_group_page)) {
-    //         vm_page_for_families_t *new_family = __mm_create_new_page_for_families_struct(struct_name, struct_size);
-    //         __mm_add_new_family_group_page_to_global_group(new_family);
-    //     }
-
-    //     if ()
-    // }
-
-    // for (__uint32_t i = 0; i < MM_MAX_FAMILIES_PER_VM_PAGE; i++) {
-        
-    // }
-
-    // if (__is_vm_page_for_families_full(first_family_group_page)) {
-    //     vm_page_for_families_t *new_family = __mm_create_new_page_for_families_struct(struct_name, struct_size);
-    //     __mm_add_new_family_group_page_to_global_group(new_family);
-    //     return;
-    // }
-
 
 }
 
@@ -194,26 +188,25 @@ void mm_instantiate_new_page_family(char *struct_name, __uint32_t struct_size) {
         return;
     }
 
+    // If the first family metadata page doesnt exists.
     if (!first_family_group_page) {
-        first_family_group_page = __mm_create_new_page_for_families_struct(struct_name, struct_size);
-        last_family_group_page = first_family_group_page;
+        first_family_group_page = __mm_create_new_metadata_page_for_struct_families(struct_name, struct_size);
         return;
     }
 
+    // Iterates through metadata pages and adds the new struct to it.
     __mm_add_struct_to_global_families(struct_name, struct_size);
 }
 
 int main(int argc, char **argv) {
     mm_init();
     
-    char *strx = "test_t";
     __uint32_t size = 4096;
-
-    char *stry = "test2_t";
-    __uint32_t sizey = 4096;
-    
-    mm_instantiate_new_page_family(strx, size);
-    mm_instantiate_new_page_family(stry, sizey);
+    for(int i = 0; i <= 120; i++) {
+        char struct_name[64];  // tamanho suficiente
+        snprintf(struct_name, sizeof(struct_name), "test_t%d", i);
+        mm_instantiate_new_page_family(struct_name, size); 
+    }
     
     printf("terminou");
     
