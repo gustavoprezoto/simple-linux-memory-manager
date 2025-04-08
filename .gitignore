@@ -1,0 +1,26 @@
+# Ignora os executáveis e arquivos de objeto
+/bin/
+/*.out
+*.o
+*.obj
+*.exe
+
+# Ignora backups e arquivos temporários de editores
+*~
+*.swp
+*.swo
+*.bak
+*.tmp
+
+# Ignora arquivos de log e de debug
+*.log
+*.dSYM/
+core
+
+# Ignora diretórios de cache (caso use IDE)
+.vscode/
+.idea/
+*.cache
+
+# Ignora arquivos gerados por ferramentas específicas
+tags
