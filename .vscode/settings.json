@@ -1,0 +1,8 @@
+{
+    // Used for hiding C/C++ extension Run/Debug buttons:
+    "C_Cpp.default.configurationProvider": "ms-vscode.makefile-tools",
+    "C_Cpp.debugShortcut": false,
+    "files.associations": {
+        "mman.h": "c"
+    }
+}
