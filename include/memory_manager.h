@@ -13,6 +13,58 @@
 #define FALSE 0
 
 /**
+ * @def ITERATE_PAGE_FAMILIES_BEGIN
+ * @brief Begins a loop over all valid vm_page_family_t entries within a vm_page_for_families_t.
+ *
+ * This macro iterates through the array of struct families stored in a page.
+ * It stops if it encounters a family with struct_size == 0 or reaches the
+ * maximum number of families allowed in a single page.
+ *
+ * Must be paired with @ref ITERATE_PAGE_FAMILIES_END.
+ *
+ * @param vm_page_for_families_ptr Pointer to the vm_page_for_families_t to iterate over.
+ * @param curr A vm_page_family_t* variable used as the loop iterator.
+ */
+#define ITERATE_PAGE_FAMILIES_BEGIN(vm_page_for_families_ptr, curr)         \
+    {                                                                       \
+        int __count = 0;                                                    \
+        for (;                                                              \
+             __count < MM_MAX_FAMILIES_PER_VM_PAGE;                       \
+             __count++)                                                     \
+        {                                                                   \
+            curr = &vm_page_for_families_ptr->vm_page_family[__count];
+
+/**
+ * @def ITERATE_PAGE_FAMILIES_END
+ * @brief Ends the loop started by @ref ITERATE_PAGE_FAMILIES_BEGIN.
+ *
+ * Closes the loop block for iterating over struct families in a page.
+ *
+ * @param vm_page_for_families_ptr Same pointer passed to the BEGIN macro.
+ * @param curr The iterator variable used in the BEGIN macro.
+ */
+#define ITERATE_PAGE_FAMILIES_END() \
+    }                                                             \
+    }
+
+/**
+ * @def MM_MAX_FAMILIES_PER_VM_PAGE
+ * @brief Calculates the maximum number of vm_page_family_t entries that can fit in a single memory page.
+ *
+ * Each vm_page_for_families structure contains a pointer to the next page and a flexible array of
+ * vm_page_family_t entries. This macro subtracts the size of the `next` pointer from the system page size
+ * and divides the remaining space by the size of each family entry to determine how many families
+ * can fit in one page.
+ *
+ * This value is used during memory manager initialization to allocate and organize struct families efficiently.
+ *
+ * @note Assumes that each family page is dedicated entirely to holding vm_page_family_t entries.
+ */
+#define MM_MAX_FAMILIES_PER_VM_PAGE \
+    (SYSTEM_PAGE_SIZE - sizeof(vm_page_for_families_t *)) /\
+        sizeof(vm_page_family_t)
+
+/**
  * @brief Represents a struct "family" definition.
  *
  * Each family corresponds to a specific struct type,
