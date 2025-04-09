@@ -135,24 +135,6 @@ static vm_page_for_families_t* __mm_create_new_metadata_page_for_struct_families
     return page;
 }
 
-static __uint8_t __is_family_metadata_page_full(vm_page_for_families_t *page) {
-    vm_page_family_t *family = NULL;
-
-    // todo: This function can be improved using a flag in the struct
-    for (size_t i; i < MM_MAX_FAMILIES_PER_VM_PAGE; i++) {
-        if (page->vm_page_family[i].struct_size == 0) {
-            return FALSE;
-        }
-    }
-
-    return TRUE;
-}
-
-static void __mm_add_new_family_group_page_to_global_group(vm_page_for_families_t *new_page) {
-    last_family_group_page->next = new_page;
-    last_family_group_page = new_page;
-}
-
 /**
  * @brief This internal function is used for adding a new struct to a metadata
  * family page. 
