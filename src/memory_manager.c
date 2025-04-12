@@ -2,10 +2,10 @@
 #include <stdio.h>
 #include <memory.h>
 #include <unistd.h>
+#include <assert.h>
 
 static vm_page_for_families_t *first_family_group_page = NULL;
-static vm_page_for_families_t *last_family_group_page = NULL;
-static size_t SYSTEM_PAGE_SIZE = 0;
+size_t SYSTEM_PAGE_SIZE = 0;
 
 void mm_init() {
     SYSTEM_PAGE_SIZE = getpagesize();
@@ -99,6 +99,11 @@ static void __mm_add_struct_to_global_families(char *struct_name, __uint32_t str
     while (TRUE) {
         // Iterates the metadata_page current to find if there is a available spot in it.
         ITERATE_PAGE_FAMILIES_BEGIN(metadata_page_iter, page_family_iter) {
+            if (strcmp(page_family_iter->struct_name, struct_name) == 0) {
+                printf("Struct %s is already cached.\n", struct_name);
+                assert(0);
+            }
+
             if (page_family_iter->struct_size == NULL || page_family_iter->struct_size == 0) {
                 strncpy(page_family_iter->struct_name, struct_name, sizeof(page_family_iter->struct_name));
                 page_family_iter->struct_size = struct_size;
@@ -138,17 +143,6 @@ void mm_instantiate_new_page_family(char *struct_name, __uint32_t struct_size) {
     __mm_add_struct_to_global_families(struct_name, struct_size);
 }
 
-int main(int argc, char **argv) {
-    mm_init();
-    
-    __uint32_t size = 4096;
-    for(int i = 0; i <= 120; i++) {
-        char struct_name[64];  // tamanho suficiente
-        snprintf(struct_name, sizeof(struct_name), "test_t%d", i);
-        mm_instantiate_new_page_family(struct_name, size); 
-    }
-    
-    printf("terminou");
-    
-    return 0;
+vm_page_for_families_t* get_families_head() {
+    return first_family_group_page;
 }

@@ -12,6 +12,26 @@
 #define TRUE 1
 #define FALSE 0
 
+extern size_t SYSTEM_PAGE_SIZE;
+
+/**
+ * @def MM_MAX_FAMILIES_PER_VM_PAGE
+ * @brief Calculates the maximum number of vm_page_family_t entries that can fit in a single memory page.
+ *
+ * Each vm_page_for_families structure contains a pointer to the next page and a flexible array of
+ * vm_page_family_t entries. This macro subtracts the size of the `next` pointer from the system page size
+ * and divides the remaining space by the size of each family entry to determine how many families
+ * can fit in one page.
+ *
+ * This value is used during memory manager initialization to allocate and organize struct families efficiently.
+ *
+ * @note Assumes that each family page is dedicated entirely to holding vm_page_family_t entries.
+ */
+#define MM_MAX_FAMILIES_PER_VM_PAGE \
+    (SYSTEM_PAGE_SIZE - sizeof(vm_page_for_families_t *)) /\
+        sizeof(vm_page_family_t)
+
+
 /**
  * @def ITERATE_PAGE_FAMILIES_BEGIN
  * @brief Begins a loop over all valid vm_page_family_t entries within a vm_page_for_families_t.
@@ -46,23 +66,6 @@
 #define ITERATE_PAGE_FAMILIES_END() \
     }                                                             \
     }
-
-/**
- * @def MM_MAX_FAMILIES_PER_VM_PAGE
- * @brief Calculates the maximum number of vm_page_family_t entries that can fit in a single memory page.
- *
- * Each vm_page_for_families structure contains a pointer to the next page and a flexible array of
- * vm_page_family_t entries. This macro subtracts the size of the `next` pointer from the system page size
- * and divides the remaining space by the size of each family entry to determine how many families
- * can fit in one page.
- *
- * This value is used during memory manager initialization to allocate and organize struct families efficiently.
- *
- * @note Assumes that each family page is dedicated entirely to holding vm_page_family_t entries.
- */
-#define MM_MAX_FAMILIES_PER_VM_PAGE \
-    (SYSTEM_PAGE_SIZE - sizeof(vm_page_for_families_t *)) /\
-        sizeof(vm_page_family_t)
 
 /**
  * @brief Represents a struct "family" definition.
@@ -106,6 +109,17 @@ void mm_init();
  * @param struct_size A 32-bit unsigned integer representing the size of the struct in bytes.
  */
 void mm_instantiate_new_page_family(char *struct_name, __uint32_t struct_size);
+
+
+/**
+ * @brief Returns the pointer to the families head variable.
+ *
+ * @warning This function returns an extremelly important function to the
+ * core memory manager system. Handle it carefully.
+ * 
+ * @return Pointer to vm_page_for_families_t type.
+ */
+vm_page_for_families_t* get_families_head();
 
 
 #endif // MEMORY_MANAGER_H

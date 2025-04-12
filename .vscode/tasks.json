@@ -5,6 +5,9 @@
             "label": "Build project using build.sh",
             "type": "shell",
             "command": "./build.sh",
+            "args": [
+                "${relativeFile}"
+            ],
             "group": "build",
             "problemMatcher": [],
             "detail": "Build both release and debug binaries"

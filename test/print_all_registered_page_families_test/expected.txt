@@ -1,0 +1,10 @@
+The expected output should be:
+
+Family n 1 structs: 
+test_t121 - test_t122 - test_t123 - test_t124 - test_t125 - test_t126 - test_t127 - test_t128 - test_t129 - test_t130 - test_t131 - test_t132 - test_t133 - test_t134 - test_t135 - test_t136 - test_t137 - test_t138 - test_t139 - test_t140 - test_t141 - test_t142 - test_t143 - test_t144 - test_t145 - test_t146 - test_t147 - test_t148 - test_t149 - test_t150 - test_t151 - test_t152 - test_t153 - test_t154 - test_t155 - test_t156 - test_t157 - test_t158 - test_t159 - test_t160 - test_t161 - test_t162 - test_t163 - test_t164 - test_t165 - test_t166 - test_t167 - test_t168 - test_t169 - test_t170 - test_t171 - test_t172 - test_t173 - test_t174 - test_t175 - test_t176 - test_t177 - test_t178 - test_t179 - test_t180 - 
+
+Family n 2 structs: 
+test_t61 - test_t62 - test_t63 - test_t64 - test_t65 - test_t66 - test_t67 - test_t68 - test_t69 - test_t70 - test_t71 - test_t72 - test_t73 - test_t74 - test_t75 - test_t76 - test_t77 - test_t78 - test_t79 - test_t80 - test_t81 - test_t82 - test_t83 - test_t84 - test_t85 - test_t86 - test_t87 - test_t88 - test_t89 - test_t90 - test_t91 - test_t92 - test_t93 - test_t94 - test_t95 - test_t96 - test_t97 - test_t98 - test_t99 - test_t100 - test_t101 - test_t102 - test_t103 - test_t104 - test_t105 - test_t106 - test_t107 - test_t108 - test_t109 - test_t110 - test_t111 - test_t112 - test_t113 - test_t114 - test_t115 - test_t116 - test_t117 - test_t118 - test_t119 - test_t120 - 
+
+Family n 3 structs: 
+test_t1 - test_t2 - test_t3 - test_t4 - test_t5 - test_t6 - test_t7 - test_t8 - test_t9 - test_t10 - test_t11 - test_t12 - test_t13 - test_t14 - test_t15 - test_t16 - test_t17 - test_t18 - test_t19 - test_t20 - test_t21 - test_t22 - test_t23 - test_t24 - test_t25 - test_t26 - test_t27 - test_t28 - test_t29 - test_t30 - test_t31 - test_t32 - test_t33 - test_t34 - test_t35 - test_t36 - test_t37 - test_t38 - test_t39 - test_t40 - test_t41 - test_t42 - test_t43 - test_t44 - test_t45 - test_t46 - test_t47 - test_t48 - test_t49 - test_t50 - test_t51 - test_t52 - test_t53 - test_t54 - test_t55 - test_t56 - test_t57 - test_t58 - test_t59 - test_t60 -
