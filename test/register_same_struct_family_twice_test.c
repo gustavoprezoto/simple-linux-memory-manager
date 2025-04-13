@@ -2,13 +2,13 @@
 
 // To run this test you should change the name of the function to main
 int run_test(void) {
-    register_same_struct_family_twice_test();
+    lookup_for_non_existent_struct_test();
     
     return 0;
 }
 
 
-static void register_same_struct_family_twice_test() {
+static void lookup_for_non_existent_struct_test() {
     // Init:
     mm_init();
 

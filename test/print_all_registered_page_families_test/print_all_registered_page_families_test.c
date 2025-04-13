@@ -16,10 +16,10 @@ static void register_3_families_pages_of_structs_test() {
 static void __mock_families_for_test();
 
 // To run this test you should change the name of the function to main
-int main(void) {
+int run_test(void) {
     register_3_families_pages_of_structs_test();
 
-    return 0;
+    return 0; 
 }
 
 static void __mock_families_for_test() {
